@@ -1,0 +1,16 @@
+{
+  "name": "ticket-please",
+  "version": "1.0.0",
+  "description": "Simplify getting an access token from an OAuth2 server.",
+  "main": "build/main.js",
+  "scripts": {
+    "start": "tsc && node build/tryit.mjs"
+  },
+  "author": "Jesse Olsson",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2",
+    "passport": "^0.6.0",
+    "passport-oauth2": "^1.7.0"
+  }
+}
