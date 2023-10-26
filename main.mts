@@ -5,88 +5,97 @@ import { TicketPleaseArguments } from "./TicketPleaseArguments.js";
 
 const app = express();
 
-const ticketPlease = (args: TicketPleaseArguments): Promise<string> => 
-    new Promise
-    (
-        (resolve, reject) => 
-        {
+const ticketPlease = (args: TicketPleaseArguments): Promise<string> => new Promise
+(
+    (resolve, reject) => 
+    {
 
-            // setup express
-            const expressApp = express();
-            expressApp.get
+        // setup passport
+        passport.use
+        (
+            new oauth2Strategy
             (
-                args.localServer.loginUrl, 
-                passport.authenticate("oauth2")
-            );
-
-
-            expressApp.get
-            (
-                "/callback",
-                passport.authenticate("oauth2", {session: false}),
-                (request, response) => 
                 {
-                    console.log("redirecting to home");
-                    response.redirect("" + "/home");
-                }
-            );
-
-
-            expressApp.get
-            (
-                "/failure",
-                (request, response) => 
+                    authorizationURL: args.credentials.authorizationUrl,
+                    tokenURL: args.credentials.tokenUrl,
+                    clientID: args.credentials.clientId,
+                    clientSecret: args.credentials.clientSecret,
+                    callbackURL: "/callback"
+                },
+                (accessToken, refreshToken, profile, cb) => 
                 {
-                    response.status(500).send("Failed to authenticate.");
-                    reject("Failed to authenticate.");
+                    return cb(null, {accessToken});
                 }
-            );
-            const expressServer = expressApp.listen
-            (
-                args.localServer.port, 
-                () => 
-                {
-                    if (!args.beQuiet) console.log
-                    (
-                        "Go to http://localhost:" + 
-                        args.localServer.port +
-                        args.localServer.loginUrl + 
-                        " to authenticate."
-                    );
-                }
-            );
+            )
+        );
 
-            // setup passport
-            passport.use
+        passport.serializeUser(function(user, done) {
+            done(null, user);
+          });
+          passport.deserializeUser(function(user, done) {
+            done(null, user);
+          });
+
+        // setup express
+        const expressApp = express();
+        expressApp.use(passport.initialize());
+        expressApp.get
+        (
+            args.localServer.loginUrl, 
+            passport.authenticate("oauth2")
+        );
+
+
+        expressApp.get
+        (
+            "/callback",
+            passport.authenticate
             (
-                new oauth2Strategy
+                "oauth2", 
+                {failureRedirect: "/failure", session: false},
+            ),
+            (request, response) => 
+            {
+                console.log("oh hi");
+                response.redirect("/success");
+            }
+        );
+
+
+        expressApp.get
+        (
+            "/failure",
+            (request, response) => 
+            {
+                response.status(500).send("Failed to authenticate.");
+                reject("Failed to authenticate.");
+            }
+        );
+        expressApp.get
+        (
+            "/success",
+            (request, response) => 
+            {
+                response.status(200).send("Successfully authenticated.");
+                resolve("thing goes here");
+            }
+        );
+        const expressServer = expressApp.listen
+        (
+            args.localServer.port, 
+            () => 
+            {
+                if (!args.beQuiet) console.log
                 (
-                    {
-                        authorizationURL: args.credentials.authorizationUrl,
-                        tokenURL: args.credentials.tokenUrl,
-                        clientID: args.credentials.clientId,
-                        clientSecret: args.credentials.clientSecret,
-                        callbackURL: "/callback"
-                    },
-                    accessToken => 
-                    {
-                        //resolve(accessToken);
-                        expressServer.close
-                        (
-                            () => 
-                            {
-                                if (!args.beQuiet) 
-                                    console.log("closed local authentication server");
-                                resolve(accessToken);
-                            }
-                        )
-                    }
-                )
-            );
+                    "Go to http://localhost:" + 
+                    args.localServer.port +
+                    args.localServer.loginUrl + 
+                    " to authenticate."
+                );
+            }
+        );
 
-            expressApp.use(passport.initialize());
-
-        }
-    );
+    }
+);
 
 export default ticketPlease;
