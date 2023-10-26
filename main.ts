@@ -67,6 +67,7 @@ const ticketPlease = (args: TicketPleaseArguments): Promise<string> => new Promi
             (request, response) => 
             {
                 response.status(200).send("Successfully authenticated.");
+                if (!args.beQuiet) console.log("Terminating the local server...");
                 expressServer.close(() => resolve(returnedAccessToken));
             }
         );
@@ -88,4 +89,4 @@ const ticketPlease = (args: TicketPleaseArguments): Promise<string> => new Promi
     }
 );
 
-export default ticketPlease;
+export {ticketPlease};
