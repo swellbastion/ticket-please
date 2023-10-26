@@ -10,6 +10,9 @@ const ticketPlease = (args: TicketPleaseArguments): Promise<string> => new Promi
     (resolve, reject) => 
     {
 
+        // variable for access token
+        let returnedAccessToken: null | string = null;
+
         // setup passport
         passport.use
         (
@@ -24,28 +27,21 @@ const ticketPlease = (args: TicketPleaseArguments): Promise<string> => new Promi
                 },
                 (accessToken, refreshToken, profile, cb) => 
                 {
-                    return cb(null, {accessToken});
+                    returnedAccessToken = accessToken;
+                    cb(null, {});
                 }
             )
         );
-
-        passport.serializeUser(function(user, done) {
-            done(null, user);
-          });
-          passport.deserializeUser(function(user, done) {
-            done(null, user);
-          });
+        passport.serializeUser((user, done) => done(null, user));
+        passport.deserializeUser((user, done) => done(null, user));
 
         // setup express
         const expressApp = express();
-        expressApp.use(passport.initialize());
         expressApp.get
         (
             args.localServer.loginUrl, 
             passport.authenticate("oauth2")
         );
-
-
         expressApp.get
         (
             "/callback",
@@ -54,14 +50,8 @@ const ticketPlease = (args: TicketPleaseArguments): Promise<string> => new Promi
                 "oauth2", 
                 {failureRedirect: "/failure", session: false},
             ),
-            (request, response) => 
-            {
-                console.log("oh hi");
-                response.redirect("/success");
-            }
+            (request, response) => response.redirect("/success")
         );
-
-
         expressApp.get
         (
             "/failure",
@@ -77,7 +67,7 @@ const ticketPlease = (args: TicketPleaseArguments): Promise<string> => new Promi
             (request, response) => 
             {
                 response.status(200).send("Successfully authenticated.");
-                resolve("thing goes here");
+                expressServer.close(() => resolve(returnedAccessToken));
             }
         );
         const expressServer = expressApp.listen

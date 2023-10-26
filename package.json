@@ -1,10 +1,11 @@
 {
+  "type": "module",
   "name": "ticket-please",
   "version": "1.0.0",
   "description": "Simplify getting an access token from an OAuth2 server.",
   "main": "build/main.js",
   "scripts": {
-    "start": "tsc && node build/tryit.mjs"
+    "start": "tsc && node build/tryit.js"
   },
   "author": "Jesse Olsson",
   "license": "MIT",
