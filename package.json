@@ -15,5 +15,6 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/swellbastion/ticket-please"
-  }
+  },
+  "types": "build/main.d.ts"
 }
