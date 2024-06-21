@@ -1,7 +1,7 @@
 import express from "express";
 import passport from "passport";
 import oauth2Strategy from "passport-oauth2";
-import { TicketPleaseArguments } from "./TicketPleaseArguments.js";
+import {TicketPleaseArguments} from "./TicketPleaseArguments.js";
 
 const app = express();
 
