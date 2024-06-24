@@ -6,18 +6,20 @@ It is a wrapper around the excellent [passport](https://www.npmjs.com/package/pa
 
 Usage example:
 
-    import {ticketPlease} from "./main.js";
+```javascript
+import {ticketPlease} from "ticket-please";
 
-    const accessToken = await ticketPlease({
-        localServer: {
-            loginUrl: "/authenticate",
-            port: 8000,
-        },
-        credentials: {
-            authorizationUrl: "https://example.com/authorization",
-            tokenUrl: "https://example.com/token",
-            clientId: "**************************",
-            clientSecret: "**************************"
-        }
-    });
-    console.log(`got an access token: ${accessToken}`);]
+const accessToken = await ticketPlease({
+    localServer: {
+        loginUrl: "/authenticate",
+        port: 8000,
+    },
+    credentials: {
+        authorizationUrl: "https://example.com/authorization",
+        tokenUrl: "https://example.com/token",
+        clientId: "**************************",
+        clientSecret: "**************************"
+    }
+});
+console.log(`got an access token: ${accessToken}`);
+```
